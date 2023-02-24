@@ -26,44 +26,27 @@ class FingerprintRecorder(object):
     '''
     ################################################################################
 
-    def record_fingerprint(self, attributes, cookie, ip):
-        # check the validity of the data
-        helper = FingerprintHelper()
-
-        # Get the list of valid attributes from the fingerprint helper
-        valid_attributes_list = list(helper.attributes.keys())
-        # print(valid_attributes_list)
-        # append the signature to the valid attributes
-        valid_attributes_list.append('signature')
-
-        sorter_valid_attributes = sorted(attributes.items())
-        serialized_attributes = json.dumps(sorter_valid_attributes)
-
-        # Creating sinature of the sorted attributes
-        signature = hashlib.md5(serialized_attributes.encode(
-            'ascii', 'ignore')).hexdigest()
-        attributes['signature'] = signature
-
-        valid_attributes = {}
-
-        for i in attributes:
-            if i in valid_attributes_list:
-                valid_attributes[i] = attributes[i]
+    def record_fingerprint(self, attributes, cookie, ip ,signature , signature_mobile):
         
+        '''
+        Function to record the fingerprint data
+        
+        '''
                 
         if self._need_to_record(cookie, signature, ip):
-            self._record_attributes(valid_attributes, signature)
+            self._record_attributes(attributes, signature , signature_mobile)
         #     pass
+        
                 
     ################################################################################
 
 
-    def _record_attributes(self, attributes, signature):
+    def _record_attributes(self, attributes, signature , signature_mobile):
         '''
         Function to record the attributes of the fingerprint
         '''
         try:
-            db.record_fingerprint(attributes , signature)
+            db.record_fingerprint(attributes , signature , signature_mobile)
             md5_attributes = FingerprintHelper().create_md5_values(attributes)
             db.update_totals_table(md5_attributes, signature)
         

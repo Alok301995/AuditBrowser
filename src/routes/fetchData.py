@@ -1,6 +1,9 @@
 from fastapi import APIRouter, Request
-from src.controller import FingerprintAgent, FingerprintHelper, FingerprintRecorder
+from src.controller import FingerprintAgent, FingerprintHelper, FingerprintRecorder, Entropy
 from src.services import detect_activity, create_df, convert_data
+import hashlib
+import json
+from src.model import Database
 
 ################################################################################
 router = APIRouter()
@@ -10,6 +13,8 @@ router = APIRouter()
 # Seperate the accelerometer data and gyroscope data from the recived data
 # and send it to the to another route for processing
 ################################################################################
+
+
 
 
 @router.post("/api/fetch_data")
@@ -49,13 +54,62 @@ async def fetch_data(request: Request):
     # pass the complete attributes to the next route using middleware
 
     recorder = FingerprintRecorder()
+    entropy = Entropy()
 
     cookie = request.cookies.get('long_cookie') or {}
     ip_addr = request.client.host.split(":")[0]
-    # print(cookie , ip_addr)
+    
+    # Validate the attributes
+    valid_attributes, signature, signature_mobile = verify_attributes(attributes)
+    
+    recorder.record_fingerprint(valid_attributes, cookie, ip_addr,signature , signature_mobile)
 
-    recorder.record_fingerprint(attributes, cookie, ip_addr)
+    res = entropy.get_bits_of_info(valid_attributes, signature , signature_mobile)
 
-    return {"status": "success"}
+    
+    return {"status": "success" ,"data": res}
+
+
+################################################################################
+
+def verify_attributes(attributes):
+    '''
+    Function to verify the attributes
+    
+    '''
+    helper = FingerprintHelper()
+
+    # Get the list of valid attributes from the fingerprint helper
+    valid_attributes_list = list(helper.attributes.keys())
+    
+    # append the signature to the valid attributes
+    valid_attributes_list.append('signature')
+
+    
+    desk_attributes = attributes.copy()
+    desk_attributes['activity'] = 'None'
+    
+    # Signature for mobile
+    sorter_valid_attributes = sorted(attributes.items())
+    serialized_attributes = json.dumps(sorter_valid_attributes)
+    signature_mobile = hashlib.md5(serialized_attributes.encode(
+        'ascii', 'ignore')).hexdigest()
+    
+
+    # Signature for desktop
+    sorted_desktop_attributes =  sorted(desk_attributes.items())
+    serialized_attributes_desktop = json.dumps(sorted_desktop_attributes)
+    signature = hashlib.md5(serialized_attributes_desktop.encode(
+        'ascii', 'ignore')).hexdigest()
+    
+    attributes['signature'] = signature
+    
+    valid_attributes = {}
+
+    for i in attributes:
+        if i in valid_attributes_list:
+            valid_attributes[i] = attributes[i]
+    
+    return  valid_attributes, signature, signature_mobile
 
 ################################################################################

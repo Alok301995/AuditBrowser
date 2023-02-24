@@ -1,3 +1,4 @@
 from src.controller.fingerprint_agent import FingerprintAgent
 from src.controller.fingerprint_helper import FingerprintHelper
 from src.controller.fingerprint_recoder import FingerprintRecorder
+from src.controller.entropy import Entropy

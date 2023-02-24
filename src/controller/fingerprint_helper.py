@@ -37,26 +37,8 @@ class FingerprintHelper(object):
         # 'location' : 'Location'
     }
 
-    # Fingerprint Expantion Keys are the list of kes that are used to expand the fingerprint
-    # table to store fingerprint data in the database.
-
-    fingerprint_expansion_keys = {
-        'keys': [
-            'fonts_v2',
-            'supercookies_v2',
-            'canvas_hash_v2',
-            'webgl_hash_v2',
-            'timezone_string',
-            'webgl_vendor_renderer',
-            'ad_block',
-            'audio',
-            'cpu_class',
-            'hardware_concurrency',
-            'device_memory'
-            'loads_remote_fonts'
-        ]
-    }
-
+    ################################################################################
+    
     # There are some keys that are long strings that we want to use the md5 to make
     # it possible to store in the database. It is due to limitation of the database
     # storing long strings

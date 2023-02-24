@@ -83,16 +83,28 @@ class Database:
                 
                 ''')
 
-            # Signature table for storing signature
+            # Signature table for storing desktop browser signatures and their count
 
             self.conn.execute('''
                               
                 CREATE TABLE IF NOT EXISTS signatures (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 signature TEXT DEFAULT '',
+                count INTEGER NOT NULL DEFAULT 0,
                 UNIQUE (signature)
                 );
                 ''')
+
+            # Signature table for storing mobile browser signatures and their count
+
+            self.conn.execute('''
+                                CREATE TABLE IF NOT EXISTS signatures_mobile (
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                signature TEXT DEFAULT '',
+                                count INTEGER NOT NULL DEFAULT 0,
+                                UNIQUE (signature)
+                                );
+                                ''')
 
             # Total table to strore counts of each attribute
 
@@ -196,7 +208,7 @@ class Database:
 
     #####################################################################################
 
-    def _record_signature(self, signature):
+    def _record_signature_desktop(self, signature):
         '''
         Function to record signature in signatures table
 
@@ -205,22 +217,108 @@ class Database:
         try:
             conn = self.connect_db()
             conn.execute(
-                '''INSERT INTO signatures (signature) VALUES (?) ON CONFLICT(signature) DO UPDATE SET signature=signature ''', (signature,))
+                '''INSERT INTO signatures (signature ,count) VALUES (? ,1) ON CONFLICT(signature) DO UPDATE SET count=count+1 ''', (signature,))
             conn.commit()
         except Error as e:
-            print('Error in Signatures table : ', e)
+            print('Error in Desktop Browser Signatures table : ', e)
         finally:
             conn.close()
 
     #####################################################################################
 
-    def record_fingerprint(self, attribute, signature):
+    def _record_signature_mobile(self, signature):
+        '''
+        Function to record signature in signatures table
+
+        '''
+
+        try:
+            conn = self.connect_db()
+            conn.execute(
+                '''INSERT INTO signatures_mobile (signature ,count) VALUES (? ,1) ON CONFLICT(signature) DO UPDATE SET count=count+1 ''', (signature,))
+            conn.commit()
+        except Error as e:
+            print('Error in Mobile Browser Signatures table : ', e)
+        finally:
+            conn.close()
+
+    #####################################################################################
+
+    def record_fingerprint(self, attributes, signature_desk, signature_mob):
         '''
         Function to record attribute and signature in fingerprints and signatures table
 
         '''
+
         try:
-            self._record_fingerprint_helper(attribute)
-            self._record_signature(signature)
+            self._record_fingerprint_helper(attributes)
+            self._record_signature_desktop(signature_desk)
+            self._record_signature_mobile(signature_mob)
         except Error as e:
             print('Error in Record_fingerprint Function :', e)
+
+    #####################################################################################
+
+
+    def fetch_count(self, signature , signature_mobile):
+        '''
+        Function to get count of particular signature from the respective table
+
+        '''
+        desk_count , desk_tot_count  = 0 , 0
+        mob_count ,mob_tot_count = 0,0
+        try:
+            conn = self.connect_db()
+            desk_count =  conn.execute(''' SELECT count FROM signatures WHERE signature =? ''', (signature,)).fetchone()[0]
+            mob_count =  conn.execute(''' SELECT count FROM signatures_mobile WHERE signature =? ''', (signature_mobile,)).fetchone()[0]
+            desk_tot_count = conn.execute(''' SELECT SUM(count) FROM signatures''').fetchone()[0]
+            mob_tot_count = conn.execute(''' SELECT SUM(count) FROM signatures_mobile''').fetchone()[0]
+            
+            conn.close()
+
+        except Error as e:
+            print(e)
+
+        return ([(desk_count,desk_tot_count),(mob_count,mob_tot_count)])
+
+    #####################################################################################
+
+    def fetch_individual_count(self, variable, value ):
+        '''
+        Helper function to get count of each variable from the table
+
+        '''
+        count = 0
+
+        try:
+            conn = self.connect_db()
+            count = conn.execute('''
+                                        SELECT total FROM totals WHERE variable =? AND value =?
+                                        ''', (variable, value)).fetchone()[0]
+            conn.close()
+        except Error as e:
+            print(e)
+
+        return count
+
+    #####################################################################################
+
+    def fetch_count_totals_table(self):
+        '''
+        Function to get total count from totals table
+
+        '''
+        count = 0
+        try:
+            conn = self.connect_db()
+            count = conn.execute('''
+                                        SELECT total FROM totals WHERE value ='count'
+                                        ''').fetchone()[0]
+            conn.close()
+
+        except Error as e:
+            print(e)
+
+        return count
+
+    #####################################################################################
