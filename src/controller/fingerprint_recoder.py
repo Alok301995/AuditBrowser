@@ -3,8 +3,8 @@ import json
 import time
 import hashlib
 from util import get_ip_hmacs
-from controller import FingerprintAgent
-from controller import FingerprintHelper
+from src.controller import FingerprintAgent
+from src.controller import FingerprintHelper
 from src.config import config
 from src.model import Database
 from sqlite3 import Error

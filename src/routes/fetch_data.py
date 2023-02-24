@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request
-from controller import FingerprintAgent, FingerprintHelper , FingerprintRecorder
+from src.controller import FingerprintAgent, FingerprintHelper , FingerprintRecorder
 from src.services import detect_activity, create_df, convert_data
 
 ################################################################################
