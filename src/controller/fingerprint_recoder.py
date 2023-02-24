@@ -25,7 +25,7 @@ class FingerprintRecorder(object):
     '''
     ################################################################################
 
-    def record_fingerprint(self, attributes, cookie, ip, ip34):
+    def record_fingerprint(self, attributes, cookie, ip):
         # check the validity of the data
         helper = FingerprintHelper()
 
@@ -48,6 +48,9 @@ class FingerprintRecorder(object):
             if i in valid_attributes_list:
                 valid_attributes[i] = attributes[i]
                 
+        if self._need_to_record(cookie, signature, ip):
+            self._record_attributes(valid_attributes, signature)
+                
     ################################################################################
 
 
@@ -55,13 +58,20 @@ class FingerprintRecorder(object):
         '''
         Function to record the attributes of the fingerprint
         '''
-        pass
+        try:
+            db.record_fingerprint(attributes , signature)
+            md5_attributes = FingerprintHelper().get_md5_attributes(attributes)
+            db.update_totals_table(md5_attributes, signature)
+        
+        except Error as e:
+            print(e)
+        
 
 
 
     ################################################################################
 
-    def _need_to_record(self, cookie, signature, ip_addr, key):
+    def _need_to_record(self, cookie, signature, ip_addr):
         '''
         Function to check if the fingerprint is already recorded or not
         
@@ -74,7 +84,7 @@ class FingerprintRecorder(object):
                 write_cookie = cookie
             else:
                 write_cookie = 'no cookie'
-            ip, google_style_ip = get_ip_hmacs(ip_addr, key)
+            ip, google_style_ip = get_ip_hmacs(ip_addr)
             db.record_sighting(cookie, signature, ip, google_style_ip)
         except Error as e:
             print(e)

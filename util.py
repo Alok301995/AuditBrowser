@@ -27,14 +27,14 @@ def number_format(num, places=0):
 ####################################################################################
 
 
-def get_ip_hmacs(ip_addr, key):
+def get_ip_hmacs(ip_addr):
     # result looks like 192.168.1
     google_style_ip_split = ip_addr.split(".")[0:3]
     # we're not handling ipv6
     google_style_ip_raw = ".".join(google_style_ip_split)
 
-    google_style_ip = hmac.new(key, google_style_ip_raw.encode("utf8"), 'MD5').hexdigest()
-    ip = hmac.new(key, ip_addr.encode("utf8"), 'MD5').hexdigest()
+    google_style_ip = hmac.new(b'', google_style_ip_raw.encode("utf8"), 'MD5').hexdigest()
+    ip = hmac.new(b'', ip_addr.encode("utf8"), 'MD5').hexdigest()
     return ip, google_style_ip
 
 ####################################################################################
