@@ -4,10 +4,10 @@ from src.config import config
 
 
 class Database:
-    
+
     conn = None
     db_file = None
-    
+
     ####################################################################################
 
     def __init__(self, db_file):
@@ -16,7 +16,6 @@ class Database:
         self.conn = self.connect_db()
 
     ####################################################################################
-
 
     def connect_db(self):
         """ 
@@ -31,7 +30,6 @@ class Database:
         return conn
 
     ####################################################################################
-
 
     def create_table(self):
         '''
@@ -52,7 +50,7 @@ class Database:
                 );
                 ''')
             # Fingerprint table to store all the attributes of the fingerprint
-            
+
             self.conn.execute('''
                 CREATE TABLE IF NOT EXISTS fingerprints (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -79,7 +77,8 @@ class Database:
                 device_memory TEXT DEFAULT NULL,
                 load_remote_fonts TEXT DEFAULT NULL,
                 signature TEXT NOT NULL DEFAULT '',
-                count INTEGER NOT NULL DEFAULT 1
+                count INTEGER NOT NULL DEFAULT 1,
+                UNIQUE (signature)
                 );
                 
                 ''')
@@ -90,8 +89,8 @@ class Database:
                               
                 CREATE TABLE IF NOT EXISTS signatures (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                signature TEXT UNIQUE DEFAULT NULL,
-                fingerprint_id INTEGER NOT NULL REFERENCES fingerprints(id)
+                signature TEXT DEFAULT '',
+                UNIQUE (signature)
                 );
                 ''')
 
@@ -101,9 +100,10 @@ class Database:
                 '''
                 CREATE TABLE IF NOT EXISTS totals (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                variable TEXT UNIQUE NOT NULL DEFAULT '',
+                variable TEXT NOT NULL DEFAULT '',
                 value TEXT NOT NULL DEFAULT '',
-                total INTEGER NOT NULL DEFAULT 0
+                total INTEGER NOT NULL DEFAULT 0,
+                UNIQUE (value)
                 );
                 
                 '''
@@ -115,7 +115,6 @@ class Database:
             print(e)
 
     ####################################################################################
-
 
     def count_sightings(self, cookie_id, signature):
         '''
@@ -132,21 +131,26 @@ class Database:
             return count
         except Error as e:
             print(e)
-        
+
     #####################################################################################
-    
+
     def record_sighting(self, cookie, signature, ip, google_style_ip):
         '''
         Function to put (cookie , signature , ip , google_style_ip) in the cookies table
 
         '''
-        conn = self.connect_db()
-        conn.execute(''' 
+
+        try:
+            conn = self.connect_db()
+            conn.execute(''' 
                            INSERT INTO cookies (cookie_id , signature , ip , ip34) VALUES (?,?,?,?)
                            ''', (cookie, signature, ip, google_style_ip))
-        conn.commit()
-        conn.close()
-        
+            conn.commit()
+        except Error as e:
+            print('Error in Cookies table :', e)
+        finally:
+            conn.close()
+
     #####################################################################################
 
     def update_totals_table(self, attributes, signature):
@@ -154,70 +158,69 @@ class Database:
         Function to update the totals table by incrementing the count of each attribute by 1
 
         '''
+
         conn = self.connect_db()
         try:
             query = """ INSERT INTO totals (variable , value , total) VALUES (?,?,1) ON CONFLICT(value) DO UPDATE SET total = total + 1 """
-            conn.execute(query, ('count', ''))
+            conn.execute(query, ('count', 'count'))
 
             for attribute in attributes:
                 conn.execute(query, (attribute, attributes[attribute]))
 
             conn.commit()
         except Error as e:
-            print(e)
+            print('Error in Totals table : ', e)
         finally:
             conn.close()
 
-
     #####################################################################################
 
-    def _record_fingerprint_helper(self ,attributes):
+    def _record_fingerprint_helper(self, attributes):
         '''
         Functiont to insert attributes in fingerprints table
-        
+
         '''
-        
+
         try:
             conn = self.connect_db()
             query_str = '''INSERT INTO fingerprints (cookie_enabled , user_agent , http_accept , plugins , fonts , timezone , video , supercookies , canvas_hash , dnt_enabled , webgl_hash , language , touch_support , activity , timezone_string , webgl_vendor_renderer , ad_block , audio , cpu_class , hardware_concurrency , device_memory , load_remote_fonts , signature) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                             ON CONFLICT (signature) DO UPDATE SET count = count + 1
                         '''
-            conn.execute(query_str, (attributes.values()))
+            conn.execute(query_str, (attributes['cookie_enabled'], attributes['user_agent'], attributes['http_accept'], attributes['plugins'], attributes['fonts'], attributes['timezone'], attributes['video'], attributes['supercookies'], attributes['canvas_hash'], attributes['dnt_enabled'], attributes['webgl_hash'], attributes['language'],
+                         attributes['touch_support'], attributes['activity'], attributes['timezone_string'], attributes['webgl_vendor_renderer'], attributes['ad_block'], attributes['audio'], attributes['cpu_class'], attributes['hardware_concurrency'], attributes['device_memory'], attributes['loads_remote_fonts'], attributes['signature'],))
             conn.commit()
         except Error as e:
-            print(e)
-        finally:
-            conn.close()
-    
-    #####################################################################################
-    
-    def _record_signature(self , signature):
-        '''
-        Function to record signature in signatures table
-    
-        '''
-        
-        try:
-            conn = self.connect_db()
-            conn.execute('''INSERT INTO signatures (signature) VALUES (?)''', (signature,))
-            conn.commit()
-        except Error as e:
-            print(e)
+            print('Error in Fingerprints table : ', e)
         finally:
             conn.close()
 
     #####################################################################################
-    
-    
-    def record_fingerprint(self , attribute , signature):
+
+    def _record_signature(self, signature):
+        '''
+        Function to record signature in signatures table
+
+        '''
+
+        try:
+            conn = self.connect_db()
+            conn.execute(
+                '''INSERT INTO signatures (signature) VALUES (?) ON CONFLICT(signature) DO UPDATE SET signature=signature ''', (signature,))
+            conn.commit()
+        except Error as e:
+            print('Error in Signatures table : ', e)
+        finally:
+            conn.close()
+
+    #####################################################################################
+
+    def record_fingerprint(self, attribute, signature):
         '''
         Function to record attribute and signature in fingerprints and signatures table
-        
+
         '''
         try:
             self._record_fingerprint_helper(attribute)
             self._record_signature(signature)
         except Error as e:
-            print(e)
-        
-        
+            print('Error in Record_fingerprint Function :', e)

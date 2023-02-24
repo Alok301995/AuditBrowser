@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request
-from src.controller import FingerprintAgent, FingerprintHelper , FingerprintRecorder
+from src.controller import FingerprintAgent, FingerprintHelper, FingerprintRecorder
 from src.services import detect_activity, create_df, convert_data
 
 ################################################################################
@@ -10,6 +10,8 @@ router = APIRouter()
 # Seperate the accelerometer data and gyroscope data from the recived data
 # and send it to the to another route for processing
 ################################################################################
+
+
 @router.post("/api/fetch_data")
 async def fetch_data(request: Request):
 
@@ -43,17 +45,17 @@ async def fetch_data(request: Request):
         attributes[key] = str(data[key])
 
     attributes["activity"] = activity
-    
-    
-    # pass the complete attributes to the next route using middleware
-    
-    recorder = FingerprintRecorder()
-    
-    recorder.record_fingerprint(attributes)
 
-    
+    # pass the complete attributes to the next route using middleware
+
+    recorder = FingerprintRecorder()
+
+    cookie = request.cookies.get('long_cookie') or {}
+    ip_addr = request.client.host.split(":")[0]
+    # print(cookie , ip_addr)
+
+    recorder.record_fingerprint(attributes, cookie, ip_addr)
 
     return {"status": "success"}
-    # return {"status" : "success"}
 
 ################################################################################

@@ -8,6 +8,7 @@ from src.controller import FingerprintHelper
 from src.config import config
 from src.model import Database
 from sqlite3 import Error
+from fastapi import Request, Response
 
 
 ####################################################################################
@@ -31,6 +32,7 @@ class FingerprintRecorder(object):
 
         # Get the list of valid attributes from the fingerprint helper
         valid_attributes_list = list(helper.attributes.keys())
+        # print(valid_attributes_list)
         # append the signature to the valid attributes
         valid_attributes_list.append('signature')
 
@@ -47,9 +49,11 @@ class FingerprintRecorder(object):
         for i in attributes:
             if i in valid_attributes_list:
                 valid_attributes[i] = attributes[i]
+        
                 
         if self._need_to_record(cookie, signature, ip):
             self._record_attributes(valid_attributes, signature)
+        #     pass
                 
     ################################################################################
 
@@ -60,7 +64,7 @@ class FingerprintRecorder(object):
         '''
         try:
             db.record_fingerprint(attributes , signature)
-            md5_attributes = FingerprintHelper().get_md5_attributes(attributes)
+            md5_attributes = FingerprintHelper().create_md5_values(attributes)
             db.update_totals_table(md5_attributes, signature)
         
         except Error as e:
@@ -76,6 +80,7 @@ class FingerprintRecorder(object):
         Function to check if the fingerprint is already recorded or not
         
         '''
+        seen = 0
         try:
             # connect to the database
             conn = db.connect_db()
@@ -85,7 +90,7 @@ class FingerprintRecorder(object):
             else:
                 write_cookie = 'no cookie'
             ip, google_style_ip = get_ip_hmacs(ip_addr)
-            db.record_sighting(cookie, signature, ip, google_style_ip)
+            db.record_sighting(write_cookie, signature, ip, google_style_ip)
         except Error as e:
             print(e)
 

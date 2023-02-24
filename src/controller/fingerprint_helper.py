@@ -17,7 +17,7 @@ class FingerprintHelper(object):
         'timezone': "Time Zone Offset",
         'timezone_string': "Time Zone",
         'video': "Screen Size and Color Depth",
-        'fonts_v2': "System Fonts",
+        'fonts': "System Fonts",
         'cookie_enabled': "Are Cookies Enabled?",
         'supercookies': "Limited supercookie test",
         'canvas_hash': "Hash of canvas fingerprint",
