@@ -4,6 +4,7 @@ from src.services import detect_activity, create_df, convert_data
 import hashlib
 import json
 from src.model import Database
+from fastapi.middleware.cors import CORSMiddleware
 
 ################################################################################
 router = APIRouter()
@@ -17,12 +18,15 @@ router = APIRouter()
 
 
 
+
+
 @router.post("/api/fetch_data")
 async def fetch_data(request: Request):
 
     body = await request.json()
 
     data = body["attributes"]
+    print(data)
 
     # get the server side attributes
     agent = FingerprintAgent(request)

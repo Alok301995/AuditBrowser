@@ -3,3 +3,4 @@ database.db
 notes.txt
 .DS_Store
 .gitignore
+/client
