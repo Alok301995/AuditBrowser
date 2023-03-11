@@ -228,12 +228,12 @@
       ]);
     }
 
-    if (
-      DeviceMotionEvent &&
-      typeof DeviceMotionEvent.requestPermission === "function"
-    ) {
-      DeviceMotionEvent.requestPermission();
-    }
+    // if (
+    //   DeviceMotionEvent &&
+    //   typeof DeviceMotionEvent.requestPermission === "function"
+    // ) {
+    //   DeviceMotionEvent.requestPermission();
+    // }
 
     if (window.DeviceMotionEvent) {
       console.log('Device has an accelerometer.');
@@ -264,7 +264,7 @@
       setTimeout(function () {
         window.removeEventListener("devicemotion", handleMotion);
         window.removeEventListener("deviceorientation", handleOrientation);
-        console.log(data_point);
+        // console.log(data_point);
         attributes["accelerometer"] = data_point;
         button_text.style.display = "block";
         loader.style.display = "none";
