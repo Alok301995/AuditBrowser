@@ -25,7 +25,7 @@ async def index(request: Request, response: Response , data: str = Query(None)):
                             max_age=31536000, httponly=True)
 
     # return {"message": "This is Home page"}
-    return templates.TemplateResponse("new_index.html", {"request": request})
+    return templates.TemplateResponse("index.html", {"request": request})
     
 
 ################################################################################
