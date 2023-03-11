@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Browser fingerprinting</title>
+</head>
+
+<body class="relative">
+  <!-- Header -->
+  <div class="container p-1 mx-auto flex flex-row items-center">
+    <div class="flex relative">
+      <!-- spinner -->
+      <img src="{{ url_for('static', path='image/logo.png') }}" alt="logo" class="w-1/2 h-full my-1">
+    </div>
+    <div class="hidden">
+      <!-- Nav bar for desktop browser -->
+      <p>hii this is hidden hamburger menu</p>
+    </div>
+    <div class="pointer-events-auto flex mr-2 justify-center items-center">
+      <!-- hamburger menu -->
+      <img id="ham-icon" src="{{ url_for('static', path='image/ham.png') }}" alt="hamburger"
+        class="w-1/2 my-1 transition ease-in delay-150">
+      <img id="close-icon" src="{{ url_for('static', path='image/close.png') }}" alt="close"
+        class="w-3/5 object-cover hidden my-1">
+
+    </div>
+
+    <div id="side-menu"
+      class="hidden absolute left-0 top-0 p-2 bottom-0 right-[50%] bg-blue-400 transition ease-linear delay-150 ">
+      <ul class="mt-10">
+        <li class=" my-2 p-2 text-white"><a>Home</a></li>
+        <li class=" my-2 p-2 text-white"><a>Learn</a></li>
+        <li class=" my-2 p-2 text-white"><a>About</a></li>
+      </ul>
+
+
+    </div>
+
+  </div>
+
+  <!-- Test Button -->
+  <div class="pt-5 flex justify-center items-center my-2 h-1/6 transition ease-in-out delay-100">
+
+    <a href="#" id="start_demo"
+      class="flex justify-center items-center border-1 rounded-md bg-blue-500 text-white w-28 h-12">
+      <svg aria-hidden="true" id="loader"
+        class="w-8 h-8 left-1/2 -ml-4 hidden mr-2 text-gray-200 animate-spin dark:text-gray-100 fill-blue-600 absolute              "
+        viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+          fill="currentColor" />
+        <path
+          d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+          fill="currentFill" />
+      </svg>
+      <p id="test_button_text">Test Browser</p>
+    </a>
+  </div>
+
+
+
+  <!-- Section Content -->
+  <div class="container h-3/6 p-2 " id="section">
+
+    <div class="flex flex-row justify-between items-center p-5 ">
+      <div class="border-2 border-gray-100 shadow-sm rounded-md m-1 py-1">
+        <p class="text-xs px-2">Desktop Browsers</p>
+        <p class="text-right text-xl px-2">153</p>
+      </div>
+      <div class="border-2 border-gray-100 rounded-md m-1 py-1">
+        <p class="text-xs px-2">Mobile Browsers</p>
+        <p class="text-right text-xl px-2">231</p>
+      </div>
+      <!-- Number of Desktop Browser seen so far -->
+      <!-- Number of Mobile Browser seen so far -->
+    </div>
+
+
+    <div class="flex flex-col">
+      <div id="info-div-1" class="flex border-transparent p-5 rounded-lg shadow-md my-1">
+        <!-- Information about Browser Fingerprinting  -->
+        <p class="text-sm">
+          <strong>Browser fingerprinting</strong> can collect a wide range of data points, including the user's browser
+          type and version,
+          operating system, screen resolution, installed fonts, plug-ins, language preferences, and more. Each data
+          point contributes to the overall complexity and uniqueness of the fingerprint, making it more difficult to
+          identify and track the user across different websites and sessions.
+        </p>
+      </div>
+      <!-- chart for every attributes  -->
+      <!-- div for chart.js -->
+      <div id="chart_container" class="hidden">
+        <!-- Create canvas for charjs -->
+        <canvas id="chart"></canvas>
+
+      </div>
+
+
+
+
+
+      <div id="info-div-2" class="flex border-transparent shadow-md rounded-lg p-5 my-1 text-sm">
+        <!-- Information about the metric used -->
+        <p>
+          The <strong>amount of information</strong> related to browser fingerprinting can vary depending on the level
+          of detail and
+          accuracy of the data points that are collected. For example, more detailed information such as installed fonts
+          or screen resolution can add additional complexity and uniqueness to the fingerprint, making it more difficult
+          to match with other users or devices.
+
+          Overall, the amount of information related to browser fingerprinting can have significant implications for
+          user privacy and security, as it can be used to track and identify users across the web without their
+          knowledge or consent. It is important for users to be aware of the potential risks of browser fingerprinting
+          and to take steps to protect their online privacy.
+
+        </p>
+      </div>
+
+      <!-- table for all the attribbutes and information of all the attributes which has uniqiue  -->
+    </div>
+
+    <div id="table" class="p-2 flex justify-center items-center">
+      <table class="table-auto">
+        <thead>
+          <tr>
+            <th class="text-sm text-left">Attribute Name</th>
+            <th class="text-sm text-left">Bits of Information</th>
+            <th class="text-sm text-left">Type of Browser</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-xs">The Sliding Mr. Bones (Next Stop, Pottersville)</td>
+            <td class="text-xs">Malcolm Lockyer</td>
+            <td class="text-xs">1961</td>
+          </tr>
+          <tr>
+            <td class="text-xs">Witchy Woman</td>
+            <td class="text-xs">The Eagles</td>
+            <td class="text-xs">1972</td>
+          </tr>
+          <tr>
+            <td class="text-xs">Shining Star</td>
+            <td class="text-xs">Earth, Wind, and Fire</td>
+            <td class="text-xs">1975</td>
+          </tr>
+        </tbody>
+      </table>
+
+
+
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <!--Absolute Positioning  -->
+
+  <div class="container flex items-center justify-center p-2 h-1/6  " id="footer">
+    <!-- Footer Information used -->
+    <div class="flex flex-row justify-center items-center">
+      <p class="mr-2 text-sm"> &#169; All Rights Reserved</p>
+      <a href="#"><img src="{{ url_for('static', path='image/github.png') }}" alt="logo" class="w-7 my-1"></a>
+
+    </div>
+
+
+  </div>
+
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script type="module">
+    import { get_attributes } from "{{ url_for('static', path='js/main.js') }}";
+    import { build_chart } from "{{ url_for('static', path='js/chart.js') }}";
+
+    // Fetch attributes from main.js
+    let attributes = {};
+    // attributes = get_attributes();
+
+    // extrach accelerometer data
+    let data_point = [];
+    let data_display = document.getElementById("data");
+
+
+    function handleMotion(event) {
+      console.log(event.acceleration.x, event.acceleration.y, event.acceleration.z);
+      data_point.push([
+        event.acceleration.x,
+        event.acceleration.y,
+        event.acceleration.z,
+      ]);
+    }
+
+    function handleOrientation(event) {
+
+      data_point.push([
+        event.alpha,
+        event.beta,
+        event.gamma,
+      ]);
+    }
+
+    // if (
+    //   DeviceMotionEvent &&
+    //   typeof DeviceMotionEvent.requestPermission === "function"
+    // ) {
+    //   DeviceMotionEvent.requestPermission();
+    // }
+
+    if (window.DeviceMotionEvent) {
+      console.log('Device has an accelerometer.');
+      attributes['info'] = 'Device has an accelerometer.';
+    } else {
+      console.log('Device does not have an accelerometer.');
+      attributes['info'] = 'Device does not have an accelerometer.';
+    }
+
+    // Code for Button Clicks
+    let test_button = document.getElementById("start_demo");
+    let button_text = document.getElementById("test_button_text");
+    let loader = document.getElementById("loader");
+    let info_div_1 = document.getElementById("info-div-1");
+    let chart_container = document.getElementById("chart_container");
+
+
+    
+    window.addEventListener("devicemotion", handleMotion);
+    window.addEventListener("deviceorientation", handleOrientation);
+
+    // addeventlistener for button click
+    test_button.addEventListener("click", function (event) {
+      event.preventDefault();
+      console.log("Button  Clicked");
+      button_text.style.display = "none";
+      loader.style.display = "block";
+      setTimeout(function () {
+        window.removeEventListener("devicemotion", handleMotion);
+        window.removeEventListener("deviceorientation", handleOrientation);
+        console.log(data_point);
+        attributes["accelerometer"] = data_point;
+        button_text.style.display = "block";
+        loader.style.display = "none";
+        // info_div_1.style.display = "none";
+        fetch("/api", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+          },
+          body: JSON.stringify(attributes),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Success:", data);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+        , 2000);
+
+    });
+
+
+
+
+
+
+
+
+
+
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src=" https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js "></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script type="module" src="{{ url_for('static', path='js/main.js') }}" type="text/javascript"></script>
+  <script src="{{ url_for('static', path='js/home.js') }}"></script>
+  <script type="module" src="{{ url_for('static', path='js/chart.js') }}"></script>
+</body>
+
+</html>

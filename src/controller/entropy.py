@@ -33,6 +33,7 @@ class Entropy(object):
         total_count = db.fetch_count_totals_table()
         for i in list:
             count = db.fetch_individual_count(i, md5_attributes[i])
+            # print(i ,md5_attributes[i], count, total_count)
             boi = self.bits_of_info(i, count, total_count)
             result.append(boi)
 

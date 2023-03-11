@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Response , Query
 from src.controller import FingerprintAgent, FingerprintHelper, FingerprintRecorder, Entropy
 from src.services import detect_activity, create_df, convert_data
 import hashlib
 import json
 from src.model import Database
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 ################################################################################
 router = APIRouter()
@@ -16,62 +17,71 @@ router = APIRouter()
 ################################################################################
 
 
+@router.post("/api")
+async def test_incomming_data(request : Request):
+    data = await request.body()
+    print(data)
+    return {"message": "This is Home page", data: data }
+
+
+
 
 
 
 
 @router.post("/api/fetch_data")
-async def fetch_data(request: Request):
+async def fetch_data(request: Request , response : Response):
+    try:
+        print("Inside Fetch data")
+        data = await request.body()
+        data = data.decode('utf-8')
+        data = json.loads(data)['attributes']
+        print(data)
+        val = False
+        if val:
+            # get the server side attributes
+            agent = FingerprintAgent(request)
+            server_attribues = agent.detect_server_attributes()
 
-    body = await request.json()
+            # Step to verify the incomming data
+            attributes = server_attribues.copy()
 
-    data = body["attributes"]
-    print(data)
+            activity = "None"  
+            data_points = []
+            accelerometer_data = data["accelerometer"]
+            if accelerometer_data:
+                data_points = convert_data(accelerometer_data)
+                df = create_df(data_points)
+                activity = detect_activity(df)
 
-    # get the server side attributes
-    agent = FingerprintAgent(request)
-    server_attribues = agent.detect_server_attributes()
+            # fill the valid_attributes with the data from the client
+            for key in data:
+                attributes[key] = str(data[key])
 
-    # Step to verify the incomming data
-    attributes = server_attribues.copy()
+            attributes["activity"] = activity
 
-    # Steps ahead
-    # get the accelerometer data from valid_attributes
-    # process it and attach the activity to activity variable
-    # get the activity of the user from the accelerometer data
+            # pass the complete attributes to the next route using middleware
 
-    activity = "None"
-    if data:
-        data_points = []
-        accelerometer_data = data["accelerometer"]['data']
-        if accelerometer_data:
-            data_points = convert_data(accelerometer_data)
-            df = create_df(data_points)
-            activity = detect_activity(df)
+            recorder = FingerprintRecorder()
+            entropy = Entropy()
 
-    # fill the valid_attributes with the data from the client
-    for key in data:
-        attributes[key] = str(data[key])
+            cookie = request.cookies.get('long_cookie') or {}
+            ip_addr = request.client.host.split(":")[0]
+            
+            # Validate the attributes
+            valid_attributes, signature, signature_mobile = verify_attributes(attributes)
+            # print(valid_attributes)
+            
+            recorder.record_fingerprint(valid_attributes, cookie, ip_addr,signature , signature_mobile)
 
-    attributes["activity"] = activity
+            res = entropy.get_bits_of_info(valid_attributes, signature , signature_mobile)
+            
+            return {"status": "success" ,"data": res}
+        else:
+            return {"message": "No data received"}
 
-    # pass the complete attributes to the next route using middleware
-
-    recorder = FingerprintRecorder()
-    entropy = Entropy()
-
-    cookie = request.cookies.get('long_cookie') or {}
-    ip_addr = request.client.host.split(":")[0]
-    
-    # Validate the attributes
-    valid_attributes, signature, signature_mobile = verify_attributes(attributes)
-    
-    recorder.record_fingerprint(valid_attributes, cookie, ip_addr,signature , signature_mobile)
-
-    res = entropy.get_bits_of_info(valid_attributes, signature , signature_mobile)
-
-    
-    return {"status": "success" ,"data": res}
+    except:
+        return {"message": "Error Occured"}
 
 
 ################################################################################
