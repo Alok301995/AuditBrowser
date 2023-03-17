@@ -49,7 +49,7 @@ async def fetch_data(request: Request , response : Response):
 
             attributes["activity"] = activity
             
-            print(attributes)
+            print(activity)
 
             # print(attributes)
             # pass the complete attributes to the next route using middleware
