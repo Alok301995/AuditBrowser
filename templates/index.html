@@ -211,6 +211,8 @@
         window.removeEventListener("deviceorientation", handleOrientation);
         attributes["accelerometer"] = data_point;
         let send_data = { "attributes": attributes }
+        console.log(send_data);
+
         //     button_text.style.display = "block";
         //     loader.style.display = "none";
 
@@ -229,6 +231,7 @@
           .then((data) => {
             let dat = [];
             let cat = [];
+            console.log(data['data']);
             let res = data['data']['attributes'];
             let d_boi = data['data']['desktop']['bits_of_info'];
             let m_boi = data['data']['mobile']['bits_of_info'];

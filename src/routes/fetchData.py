@@ -23,7 +23,7 @@ async def fetch_data(request: Request , response : Response):
         req = await request.body()
         data = req.decode('utf8').replace("'", '"')
         data = json.loads(data)['attributes']
-        # print(data)
+        print(data)
         
         # print(data)
         val =  False
