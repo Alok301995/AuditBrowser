@@ -76,6 +76,7 @@ class Database:
                 hardware_concurrency TEXT DEFAULT NULL,
                 device_memory TEXT DEFAULT NULL,
                 load_remote_fonts TEXT DEFAULT NULL,
+                platform TEXT DEFAULT NULL,
                 signature TEXT NOT NULL DEFAULT '',
                 count INTEGER NOT NULL DEFAULT 1,
                 UNIQUE (signature)
@@ -195,11 +196,34 @@ class Database:
 
         try:
             conn = self.connect_db()
-            query_str = '''INSERT INTO fingerprints (cookie_enabled , user_agent , http_accept , plugins , fonts , timezone , video , supercookies , canvas_hash , dnt_enabled , webgl_hash , language , touch_support , activity , timezone_string , webgl_vendor_renderer , ad_block , audio , cpu_class , hardware_concurrency , device_memory , load_remote_fonts , signature) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            query_str = '''INSERT INTO fingerprints (cookie_enabled , user_agent , http_accept , plugins , fonts , timezone , video , supercookies , canvas_hash , dnt_enabled , webgl_hash , language , touch_support , activity , timezone_string , webgl_vendor_renderer , ad_block , audio , cpu_class , hardware_concurrency , device_memory , load_remote_fonts ,platform, signature) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                             ON CONFLICT (signature) DO UPDATE SET count = count + 1
                         '''
-            conn.execute(query_str, (attributes['cookie_enabled'], attributes['user_agent'], attributes['http_accept'], attributes['plugins'], attributes['fonts'], attributes['timezone'], attributes['video'], attributes['supercookies'], attributes['canvas_hash'], attributes['dnt_enabled'], attributes['webgl_hash'], attributes['language'],
-                         attributes['touch_support'], attributes['activity'], attributes['timezone_string'], attributes['webgl_vendor_renderer'], attributes['ad_block'], attributes['audio'], attributes['cpu_class'], attributes['hardware_concurrency'], attributes['device_memory'], attributes['loads_remote_fonts'], attributes['signature'],))
+            conn.execute(query_str, (str(attributes['cookie_enabled']),
+                                     str(attributes['user_agent']),
+                                     str(attributes['http_accept']),
+                                     str(attributes['plugins']),
+                                     str(attributes['fonts']),
+                                     str(attributes['timezone']),
+                                     str(attributes['video']),
+                                     str(attributes['supercookies']),
+                                     str(attributes['canvas_hash']),
+                                     str(attributes['dnt_enabled']),
+                                     str(attributes['webgl_hash']),
+                                     str(attributes['language']),   
+                                    str(attributes['touch_support']),
+                                    str(attributes['activity']), 
+                                    str(attributes['timezone_string']), 
+                                    str(attributes['webgl_vendor_renderer']), 
+                                    str(attributes['ad_block']),
+                                    str(attributes['audio']), 
+                                    str(attributes['cpu_class']), 
+                                    str(attributes['hardware_concurrency']), 
+                                    str(attributes['device_memory']), 
+                                    str(attributes['loads_remote_fonts']),
+                                    str(attributes['platform']),
+                                    str(attributes['signature']),
+                                    ))
             conn.commit()
         except Error as e:
             print('Error in Fingerprints table : ', e)
@@ -294,9 +318,10 @@ class Database:
             conn = self.connect_db()
             count = conn.execute('''
                                         SELECT total FROM totals WHERE variable =? AND value =?
-                                        ''', (variable, value)).fetchone()[0]
+                                        ''', (str(variable), str(value))).fetchone()[0]
             conn.close()
         except Error as e:
+            print("error thrown from fetch_individual_count")
             print(e)
 
         return count

@@ -31,8 +31,9 @@ class FingerprintAgent:
             self._get_header('accept-encoding'),
             self._get_header('accept-language')
         ])
+        # attributes['dnt_enabled'] = (self._get_header('dnt') != "")
+        attributes['dnt_enabled'] = u"no javascript"
         
-        attributes['dnt_enabled'] = (self._get_header('dnt') != "")
         attributes['plugins'] = u"no javascript"
         attributes['video'] = u"no javascript"
         attributes['timezone'] = u"no javascript"

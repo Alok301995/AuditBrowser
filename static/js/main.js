@@ -815,7 +815,7 @@ attributes["hardware_concurrency"] = navigator.hardwareConcurrency || "N/A";
 
 attributes["device_memory"] = navigator.deviceMemory || "N/A";
 
-attributes["supercookies_v2"] = determine_randomized(
+attributes["supercookies"] = determine_randomized(
   () =>
     test_dom_storage() +
     test_ie_userdata() +
@@ -856,7 +856,7 @@ if (
 
 attributes["webgl_vendor_renderer"] = generateWebGLHash()[1];
 
-attributes["timezone"] = getTimezoneString();
+attributes["timezone_string"] = getTimezoneString();
 
 attributes["adblock"] = isAdblockUsed();
 

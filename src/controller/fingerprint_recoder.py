@@ -48,6 +48,7 @@ class FingerprintRecorder(object):
         try:
             db.record_fingerprint(attributes , signature , signature_mobile)
             md5_attributes = FingerprintHelper().create_md5_values(attributes)
+            print(len(md5_attributes))
             db.update_totals_table(md5_attributes, signature)
         
         except Error as e:
