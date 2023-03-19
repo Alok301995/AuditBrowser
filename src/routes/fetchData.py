@@ -4,9 +4,6 @@ from src.services import detect_activity, create_df, convert_data
 import hashlib
 import json
 from src.model import Database
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
 
 ################################################################################
 router = APIRouter()
@@ -14,16 +11,20 @@ router = APIRouter()
 
 # Router for fetching data from the client
 # Seperate the accelerometer data and gyroscope data from the recived data
-# and send it to the to another route for processing
+# and send it to the to another route for processing.
+
 ################################################################################
 
 @router.post("/api/fetch_data")
 async def fetch_data(request: Request , response : Response):
     try:
         req = await request.body()
+        # print(req)
         data = req.decode('utf8').replace("'", '"')
-        data = json.loads(data)['attributes']
-        print(data)
+        # print(data)
+        data = json.loads(data)
+        # print(data)
+        # print("data recived from the server" , data)
         
         # print(data)
         val =  False
@@ -48,8 +49,7 @@ async def fetch_data(request: Request , response : Response):
                 attributes[key] = str(data[key])
 
             attributes["activity"] = activity
-            
-            print(activity)
+
 
             # print(attributes)
             # pass the complete attributes to the next route using middleware
@@ -62,18 +62,18 @@ async def fetch_data(request: Request , response : Response):
             
             # Validate the attributes
             valid_attributes, signature, signature_mobile = verify_attributes(attributes)
-            # print(valid_attributes)
+            print(valid_attributes)
             recorder.record_fingerprint(valid_attributes, cookie, ip_addr,signature , signature_mobile)
            
             res = entropy.get_bits_of_info(valid_attributes, signature , signature_mobile)
             
-            return {"status": "success" ,"data": res}
+            return {"status": True ,"data":res}
         else:
-            return {"message": "No data received"}
+            return {"status": False , "data":"Not able to fetch data from the client"}
 
     except Exception as e:
         print(e)
-        return {"message": "Error Occured"}
+        return {"status" : False , "data":e}
 
 
 ################################################################################
@@ -93,7 +93,7 @@ def verify_attributes(attributes):
 
     
     desk_attributes = attributes.copy()
-    desk_attributes['activity'] = 'None'
+    desk_attributes['activity'] = 'N/A'
     
     # Signature for mobile
     sorter_valid_attributes = sorted(attributes.items())

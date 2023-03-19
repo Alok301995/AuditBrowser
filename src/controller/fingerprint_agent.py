@@ -32,8 +32,6 @@ class FingerprintAgent:
             self._get_header('accept-language')
         ])
         # attributes['dnt_enabled'] = (self._get_header('dnt') != "")
-        attributes['dnt_enabled'] = u"no javascript"
-        
         attributes['plugins'] = u"no javascript"
         attributes['video'] = u"no javascript"
         attributes['timezone'] = u"no javascript"
@@ -50,9 +48,7 @@ class FingerprintAgent:
         attributes['audio'] = u"no javascript"
         attributes['cpu_class'] = u"no javascript"
         attributes['hardware_concurrency'] = u"no javascript"
-        attributes['device_memory'] = u"no javascript"
         attributes['activity'] =u"no javascript"
-        
         attributes['load_remote_fonts'] = u"no javascript"
         
         # attributes['location'] =u"no javascript"

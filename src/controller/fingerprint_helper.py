@@ -23,7 +23,6 @@ class FingerprintHelper(object):
         'canvas_hash': "Hash of canvas fingerprint",
         'webgl_hash': "Hash of WebGL fingerprint",
         'webgl_vendor_renderer': "WebGL Vendor & Renderer",
-        'dnt_enabled': "DNT Header Enabled?",
         'language': "Language",
         'platform': "Platform",
         'touch_support': "Touch Support",
@@ -31,10 +30,8 @@ class FingerprintHelper(object):
         'audio': "AudioContext fingerprint",
         'cpu_class': "CPU Class",
         'hardware_concurrency': "Hardware Concurrency",
-        'device_memory': "Device Memory (GB)",
         'activity': "Activity",
         'loads_remote_fonts': "Loads Remote Fonts",
-        # 'location' : 'Location'
     }
 
     ################################################################################

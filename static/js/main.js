@@ -813,7 +813,7 @@ attributes["cpu_class"] = navigator.cpuClass || "N/A";
 
 attributes["hardware_concurrency"] = navigator.hardwareConcurrency || "N/A";
 
-attributes["device_memory"] = navigator.deviceMemory || "N/A";
+// attributes["device_memory"] = navigator.deviceMemory || "N/A";
 
 attributes["supercookies"] = determine_randomized(
   () =>

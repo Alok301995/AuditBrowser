@@ -63,7 +63,6 @@ class Database:
                 video TEXT DEFAULT NULL,
                 supercookies TEXT DEFAULT NULL,
                 canvas_hash TEXT DEFAULT NULL,
-                dnt_enabled TEXT DEFAULT NULL,
                 webgl_hash TEXT DEFAULT NULL,
                 language TEXT DEFAULT NULL,
                 touch_support TEXT DEFAULT NULL,
@@ -74,7 +73,6 @@ class Database:
                 audio TEXT DEFAULT NULL,
                 cpu_class TEXT DEFAULT NULL,
                 hardware_concurrency TEXT DEFAULT NULL,
-                device_memory TEXT DEFAULT NULL,
                 load_remote_fonts TEXT DEFAULT NULL,
                 platform TEXT DEFAULT NULL,
                 signature TEXT NOT NULL DEFAULT '',
@@ -196,7 +194,7 @@ class Database:
 
         try:
             conn = self.connect_db()
-            query_str = '''INSERT INTO fingerprints (cookie_enabled , user_agent , http_accept , plugins , fonts , timezone , video , supercookies , canvas_hash , dnt_enabled , webgl_hash , language , touch_support , activity , timezone_string , webgl_vendor_renderer , ad_block , audio , cpu_class , hardware_concurrency , device_memory , load_remote_fonts ,platform, signature) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            query_str = '''INSERT INTO fingerprints (cookie_enabled , user_agent , http_accept , plugins , fonts , timezone , video , supercookies , canvas_hash , webgl_hash , language , touch_support , activity , timezone_string , webgl_vendor_renderer , ad_block , audio , cpu_class , hardware_concurrency , load_remote_fonts ,platform, signature) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                             ON CONFLICT (signature) DO UPDATE SET count = count + 1
                         '''
             conn.execute(query_str, (str(attributes['cookie_enabled']),
@@ -208,7 +206,6 @@ class Database:
                                      str(attributes['video']),
                                      str(attributes['supercookies']),
                                      str(attributes['canvas_hash']),
-                                     str(attributes['dnt_enabled']),
                                      str(attributes['webgl_hash']),
                                      str(attributes['language']),   
                                     str(attributes['touch_support']),
@@ -219,7 +216,6 @@ class Database:
                                     str(attributes['audio']), 
                                     str(attributes['cpu_class']), 
                                     str(attributes['hardware_concurrency']), 
-                                    str(attributes['device_memory']), 
                                     str(attributes['loads_remote_fonts']),
                                     str(attributes['platform']),
                                     str(attributes['signature']),
@@ -241,7 +237,7 @@ class Database:
         try:
             conn = self.connect_db()
             conn.execute(
-                '''INSERT INTO signatures (signature ,count) VALUES (? ,1) ON CONFLICT(signature) DO UPDATE SET count=count+1 ''', (signature,))
+                '''INSERT INTO signatures (signature ,count) VALUES (? ,?) ON CONFLICT(signature) DO UPDATE SET count=count+1 ''', (signature,1))
             conn.commit()
         except Error as e:
             print('Error in Desktop Browser Signatures table : ', e)
