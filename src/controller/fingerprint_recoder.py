@@ -84,3 +84,81 @@ class FingerprintRecorder(object):
         return seen == 0
 
     ################################################################################
+    
+   
+# import re
+# import numpy as np
+# from sklearn.cluster import MiniBatchKMeans
+
+# def cluster_user_agents(user_agents, k=5, batch_size=1000, max_iter=100):
+#     """
+#     Clusters user agents using streaming k-means.
+
+#     Args:
+#         user_agents (list): List of user agent strings.
+#         k (int): Number of clusters.
+#         batch_size (int): Batch size for mini-batch k-means.
+#         max_iter (int): Maximum number of iterations for mini-batch k-means.
+
+#     Returns:
+#         dict: Dictionary mapping cluster centers (as strings) to lists of user agents in that cluster.
+#     """
+
+#     # Compile regular expression pattern for extracting features from user agents
+#     pattern = r'\((.*?)\)'
+
+#     # Define function for extracting features from user agent string
+#     def extract_features(ua):
+#         matches = re.findall(pattern, ua)
+#         return np.array([len(matches), len(ua)])
+
+#     # Initialize mini-batch k-means model
+#     kmeans = MiniBatchKMeans(n_clusters=k, batch_size=batch_size, max_iter=max_iter)
+
+#     # Initialize dictionary for mapping cluster centers to lists of user agents
+#     clusters = {}
+
+#     # Iterate over user agents and cluster them using streaming k-means
+#     for ua in user_agents:
+#         # Extract features from user agent string
+#         x = extract_features(ua)
+
+#         # Predict cluster for user agent
+#         label = kmeans.partial_fit([x]).labels_[0]
+
+#         # Add user agent to appropriate cluster
+#         center_str = str(kmeans.cluster_centers_[label])
+#         if center_str not in clusters:
+#             clusters[center_str] = []
+#         clusters[center_str].append(ua)
+
+#     return clusters
+
+
+#     from sklearn.cluster import MiniBatchKMeans
+#     from collections import defaultdict
+
+#     def cluster_user_agents(user_agents, num_clusters):
+#         """
+#         Clusters user agents using streaming k-means and returns the cluster size and total number of user agents.
+        
+#         Args:
+#         user_agents (list): A list of user agent strings.
+#         num_clusters (int): The number of clusters to use for k-means clustering.
+        
+#         Returns:
+#         A tuple of the form (cluster_size, total_num_user_agents), where cluster_size is a list of the size of each cluster
+#         and total_num_user_agents is the total number of user agents.
+#         """
+#         cluster_model = MiniBatchKMeans(n_clusters=num_clusters)
+#         cluster_size = defaultdict(int)
+#         total_num_user_agents = 0
+        
+#         for user_agent in user_agents:
+#             cluster_model.partial_fit([user_agent])
+#             label = cluster_model.predict([user_agent])[0]
+#             cluster_size[label] += 1
+#             total_num_user_agents += 1
+        
+#         return (list(cluster_size.values()), total_num_user_agents)
+        

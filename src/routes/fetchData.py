@@ -15,6 +15,11 @@ router = APIRouter()
 
 ################################################################################
 
+@router.get("/api/get_data")
+async def get_data():
+    return {"status": True , "data":"hellow alok"}
+
+
 @router.post("/api/fetch_data")
 async def fetch_data(request: Request , response : Response):
     try:
@@ -24,7 +29,7 @@ async def fetch_data(request: Request , response : Response):
         # print(data)
         data = json.loads(data)
         # print(data)
-        # print("data recived from the server" , data)
+        print("data recived from the server" , data)
         
         # print(data)
         val =  False
