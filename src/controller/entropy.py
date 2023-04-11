@@ -99,10 +99,12 @@ class Entropy(object):
             mob_aoi += i["ent_mob"]
         
         
-        # print(desk_aoi)
+        for i in result:
+            print(result['attribute'] ,result['ent_desk'],result['ent_mob'])
         response['attributes'] = result
         response['desktop'] = desk_aoi
         response['mobile'] = mob_aoi
+        
 
         return response
 

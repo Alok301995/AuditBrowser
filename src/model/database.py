@@ -379,9 +379,9 @@ class Database:
         etp_mob =0
         total_desk = 0
         total_mob  = 0
-        print(list_desk)
-        print("------")
-        print(list_mob)
+        # print(list_desk)
+        # print("------")
+        # print(list_mob)
         for i in list_desk:
             total_desk += i[0]
         for i in list_mob:
