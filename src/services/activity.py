@@ -77,7 +77,7 @@ def detect_activity(df):
     # Segmenting Data
     segments  = segment_signal(df ,window_size)
     # Reshaping Segments
-    segments = segments.reshape(len(segments) ,1 ,80 ,3)
+    segments = segments.reshape(len(segments) ,200 ,3)
     
     # new_label = []
     # for i in label:
