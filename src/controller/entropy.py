@@ -100,7 +100,7 @@ class Entropy(object):
         
         
         for i in result:
-            print(result['attribute'] ,result['ent_desk'],result['ent_mob'])
+            print(i['attribute'] ,i['ent_desk'],i['ent_mob'])
         response['attributes'] = result
         response['desktop'] = desk_aoi
         response['mobile'] = mob_aoi
