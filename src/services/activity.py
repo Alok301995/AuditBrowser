@@ -85,7 +85,7 @@ def detect_activity(df):
     # new_label = np.array(new_label)
     
     # Load the best_model file from folder model
-    model = load_model('./src/services/best_model.h5')
+    model = load_model('./src/services/lstm_model.h5')
     # Prediction
     pred = np.argmax(model.predict(segments) , axis= 1)
     

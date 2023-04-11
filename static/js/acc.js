@@ -9,7 +9,6 @@ let data_display = document.getElementById("data");
 // FUNCTIONS
 
 function handleMotion(event) {
-    console.log(event.acceleration.x, event.acceleration.y, event.acceleration.z);
     data_point.push([
     event.acceleration.x,
     event.acceleration.y,
@@ -38,8 +37,8 @@ function handleMotion(event) {
 // }
 
 
-
-// window.addEventListener("deviceorientation", handleOrientation);
+window.addEventListener("devicemotion", handleMotion);
+window.addEventListener("deviceorientation", handleOrientation);
 
 attributes["accelerometer"] = data_point;
 
@@ -63,6 +62,7 @@ let clicked = false;
 let hamClicked = false;
 hamMenu.addEventListener('click', (event) => {
     event.preventDefault();
+    
     if (!hamClicked) {
     hamClicked = true;
     hamNav.classList.remove('hidden');
@@ -83,27 +83,15 @@ hamMenu.addEventListener('click', (event) => {
 testButton.addEventListener('click', (event) => {
     event.preventDefault();
 
-    console.log("hellow world")
-    if(window.DeviceMotionEvent) {
-        window.addEventListener("devicemotion", handleMotion);
-        console.log("DeviceMotionEvent is supported");
-    }
-    else{
-        console.log("DeviceMotionEvent is not supported");
-    }
-
-
-
     if (!clicked) {
     clicked = true;
-    console.log("hellow world");
     loader.classList.remove('hidden');
     buttonText.classList.add('hidden');
 
     setTimeout(async () => {
         window.removeEventListener("devicemotion", handleMotion);
         attributes["accelerometer"] = data_point;
-        // console.log(attributes)
+        console.log(attributes)
 
 
         // After loading data boiContainer will be shown and 

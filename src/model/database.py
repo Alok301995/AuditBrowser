@@ -1,6 +1,7 @@
 import sqlite3 as sql
 from sqlite3 import Error
 from src.config import config
+from math import log
 
 
 class Database:
@@ -105,11 +106,26 @@ class Database:
                                 );
                                 ''')
 
-            # Total table to strore counts of each attribute
+            # Total table to strore counts of each desktop Browser attribute
 
             self.conn.execute(
                 '''
                 CREATE TABLE IF NOT EXISTS totals (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                variable TEXT NOT NULL DEFAULT '',
+                value TEXT NOT NULL DEFAULT '',
+                total INTEGER NOT NULL DEFAULT 0,
+                UNIQUE (value)
+                );
+                
+                '''
+            )
+            
+            # Totals table for storing counts of each mobile browser attribute
+            
+            self.conn.execute(
+                '''
+                CREATE TABLE IF NOT EXISTS totals_mobile (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 variable TEXT NOT NULL DEFAULT '',
                 value TEXT NOT NULL DEFAULT '',
@@ -164,7 +180,7 @@ class Database:
 
     #####################################################################################
 
-    def update_totals_table(self, attributes, signature):
+    def update_totals_table(self, attributes, signature , is_mobile):
         '''
         Function to update the totals table by incrementing the count of each attribute by 1
 
@@ -172,8 +188,12 @@ class Database:
 
         conn = self.connect_db()
         try:
-            query = """ INSERT INTO totals (variable , value , total) VALUES (?,?,1) ON CONFLICT(value) DO UPDATE SET total = total + 1 """
-            conn.execute(query, ('count', 'count'))
+            if is_mobile == False:
+                query = """ INSERT INTO totals (variable , value , total) VALUES (?,?,1) ON CONFLICT(value) DO UPDATE SET total = total + 1 """
+                conn.execute(query, ('count', 'count'))
+            else:
+                query = """ INSERT INTO totals_mobile (variable , value , total) VALUES (?,?,1) ON CONFLICT(value) DO UPDATE SET total = total + 1 """
+                conn.execute(query, ('count', 'count'))
 
             for attribute in attributes:
                 conn.execute(query, (attribute, attributes[attribute]))
@@ -303,7 +323,7 @@ class Database:
 
     #####################################################################################
 
-    def fetch_individual_count(self, variable, value ):
+    def fetch_individual_count(self, variable, value , is_mobile ):
         '''
         Helper function to get count of each variable from the table
 
@@ -312,8 +332,13 @@ class Database:
 
         try:
             conn = self.connect_db()
-            count = conn.execute('''
+            if is_mobile == False:
+                count = conn.execute('''
                                         SELECT total FROM totals WHERE variable =? AND value =?
+                                        ''', (str(variable), str(value))).fetchone()[0]
+            else:
+                count = conn.execute('''
+                                        SELECT total FROM totals_mobile WHERE variable =? AND value =?
                                         ''', (str(variable), str(value))).fetchone()[0]
             conn.close()
         except Error as e:
@@ -323,6 +348,54 @@ class Database:
         return count
 
     #####################################################################################
+    def get_all_occurences(self, variable ):
+        '''
+        Helper function to get count of each variable from the table
+
+        '''
+        list_desk = []
+        list_mob = []
+
+        try:
+            conn = self.connect_db()
+            list_desk = conn.execute('''
+                                            SELECT total FROM totals WHERE variable =?
+                                            ''', (str(variable),)).fetchall()
+            
+            list_mob = conn.execute('''
+                                            SELECT total FROM totals_mobile WHERE variable =?
+                                            ''', (str(variable),)).fetchall()
+                
+            conn.close()
+        except Error as e:
+            print("error thrown from fetch_individual_count")
+            print(e)
+
+        return (list_desk,list_mob)
+    #####################################################################################
+    def find_entropy(self, attribute, is_mobile):
+        list_desk , list_mob =  self.get_all_occurences(attribute)
+        etp_desk = 0
+        etp_mob =0
+        total_desk = 0
+        total_mob  = 0
+        for i in list_desk:
+            total_desk += i[0]
+        for i in list_mob:
+            total_mob += i[0]
+            
+        
+        if total_desk !=0:
+            for i in list_desk:
+                etp_desk = etp_desk + (i[0]/total_desk)*log(i[0]/total_desk,2)
+        if total_mob !=0:
+            for i in list_mob:
+                etp_mob = etp_mob + (i[0]/total_mob)*log(i[0]/total_mob,2)
+        return {'attribute': attribute , "ent_desk" : -1*etp_desk , "ent_mob" : -1*etp_mob }
+    #####################################################################################
+    
+    
+    
 
     def fetch_count_totals_table(self):
         '''

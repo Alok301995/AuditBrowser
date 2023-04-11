@@ -40,7 +40,7 @@ async def fetch_data(request: Request , response : Response):
             # print(server_attribues)
             # Step to verify the incomming data
             attributes = server_attribues.copy()
-
+            is_mobile = False
             activity = "N/A"  
             data_points = []
             accelerometer_data = data["accelerometer"]
@@ -48,11 +48,15 @@ async def fetch_data(request: Request , response : Response):
                 data_points = convert_data(accelerometer_data)
                 df = create_df(data_points)
                 activity = detect_activity(df)
+                
+            if activity != "N/A":
+                is_mobile  = True
+            print(activity)
 
             # fill the valid_attributes with the data from the client
             for key in data:
                 attributes[key] = str(data[key])
-
+            
             attributes["activity"] = activity
 
 
@@ -67,10 +71,10 @@ async def fetch_data(request: Request , response : Response):
             
             # Validate the attributes
             valid_attributes, signature, signature_mobile = verify_attributes(attributes)
-            print(valid_attributes)
-            recorder.record_fingerprint(valid_attributes, cookie, ip_addr,signature , signature_mobile)
+            # print(valid_attributes)
+            recorder.record_fingerprint(valid_attributes, cookie, ip_addr,signature , signature_mobile , is_mobile)
            
-            res = entropy.get_bits_of_info(valid_attributes, signature , signature_mobile)
+            res = entropy.get_bits_of_info(valid_attributes, signature , signature_mobile , is_mobile)
             
             return {"status": True ,"data":res}
         else:

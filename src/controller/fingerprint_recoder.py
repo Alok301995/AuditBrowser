@@ -26,22 +26,22 @@ class FingerprintRecorder(object):
     '''
     ################################################################################
 
-    def record_fingerprint(self, attributes, cookie, ip ,signature , signature_mobile):
+    def record_fingerprint(self, attributes, cookie, ip ,signature , signature_mobile, is_mobile):
         
         '''
         Function to record the fingerprint data
         
         '''
                 
-        if self._need_to_record(cookie, signature, ip):
-            self._record_attributes(attributes, signature , signature_mobile)
+        # if self._need_to_record(cookie, signature, ip):
+        self._record_attributes(attributes, signature , signature_mobile , is_mobile)
         #     pass
         
                 
     ################################################################################
 
 
-    def _record_attributes(self, attributes, signature , signature_mobile):
+    def _record_attributes(self, attributes, signature , signature_mobile , is_mobile):
         '''
         Function to record the attributes of the fingerprint
         '''
@@ -49,7 +49,11 @@ class FingerprintRecorder(object):
             db.record_fingerprint(attributes , signature , signature_mobile)
             md5_attributes = FingerprintHelper().create_md5_values(attributes)
             # print(len(md5_attributes))
-            db.update_totals_table(md5_attributes, signature)
+            if is_mobile == False:
+                db.update_totals_table(md5_attributes, signature,is_mobile)
+            else :
+                db.update_totals_table(md5_attributes, signature_mobile,is_mobile)
+                
         
         except Error as e:
             print(e)
