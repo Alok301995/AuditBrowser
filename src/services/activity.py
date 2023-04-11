@@ -5,9 +5,9 @@ from keras.models import load_model
 
 ################################################################################
 
-window_size = 200 #Length of time slice. Actitrac was recorded at 20Hz
+window_size = 80 #Length of time slice. Actitrac was recorded at 20Hz
 start = 0
-end = 200
+end = 80
 act = {1:"Jogging" ,5:"Walking" ,2:"Sitting" ,0:"Downstairs" ,4:"Upstairs" ,3:"Standing"}
 act_1 = {"Jogging":1 ,"Walking":5 ,"Sitting":2 ,"Downstairs":0 ,"Upstairs":4 ,"Standing":3}
 
@@ -15,7 +15,7 @@ act_1 = {"Jogging":1 ,"Walking":5 ,"Sitting":2 ,"Downstairs":0 ,"Upstairs":4 ,"S
 
 def convert_data(data):
     acc =[]
-    if len(data) != 0 and len(data) > 200:
+    if len(data) != 0 and len(data) >80:
         for i in data:
             i[0] , i[1] ,i[2] = float(i[0]) , float(i[1]) , float(i[2])
             acc.append(i)
@@ -77,7 +77,7 @@ def detect_activity(df):
     # Segmenting Data
     segments  = segment_signal(df ,window_size)
     # Reshaping Segments
-    segments = segments.reshape(len(segments) ,200 ,3)
+    segments = segments.reshape(len(segments) ,80 ,3)
     
     # new_label = []
     # for i in label:
