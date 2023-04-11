@@ -75,6 +75,7 @@ def detect_activity(df):
     df['y-axis'] = feature_normalize(df['y-axis'])
     df['z-axis'] = feature_normalize(df['z-axis'])
     # Segmenting Data
+    
     segments  = segment_signal(df ,window_size)
     # Reshaping Segments
     segments = segments.reshape(len(segments) ,1,80 ,3)
