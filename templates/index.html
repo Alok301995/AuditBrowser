@@ -326,7 +326,12 @@
 
             for (let i = 0; i < data['data']['attributes'].length; i++) {
                 cat.push(data['data']['attributes'][i]['attribute']);
+                if(data_point.length == 0){
                 dat.push(data['data']['attributes'][i]['ent_desk']);
+                }
+                else{
+                  dat.push(data['data']['attributes'][i]['ent_mob']);
+                }
             }
             let options = {
                 series: [{
